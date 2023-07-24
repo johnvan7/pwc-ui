@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import {Container} from '@mui/material';
 import NavBar from "./Components/NavBars/NavBar";
@@ -6,40 +6,13 @@ import SensorsList from "./Components/Pages/SensorsList";
 import Dashboard from "./Components/Pages/Dashboard";
 import {Outlet, Route, Routes, useLocation} from "react-router-dom";
 import Sensor from "./Components/Pages/Sensor";
-
-const sensors: Sensor[] = [
-    {
-        id: "1",
-        name: "Arduino 1",
-        tags: ["power", "iot"],
-        allowedUsers: [],
-        location: {
-            latitude: "41",
-            longitude: "14",
-            altitude: 0
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: "2",
-        name: "Arduino 2",
-        tags: ["temperature", "iot"],
-        allowedUsers: [],
-        location: {
-            latitude: "42",
-            longitude: "14",
-            altitude: 0
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    }
-];
+import {apiGet} from "./utils/api";
+import {authToken} from "./utils/constants";
 
 const routesNameMap: { [key: string]: string } = {
     "/": "Dashboard",
     "/sensors": "Sensors",
-    "/sensor/(\\d+)": "Sensor details"
+    "/sensor/([a-zA-Z0-9]+)": "Sensor details"
 };
 
 function findPageName(path: string): string {
@@ -54,6 +27,15 @@ function findPageName(path: string): string {
 
 function App() {
     const location = useLocation();
+    const [sensors, setSensors] = useState<any>([]);
+
+    useEffect(() => {
+        apiGet("/sensors", authToken).then((res) => {
+            setSensors(res.data);
+        }).catch((err) => {
+            console.error(err);
+        });
+    }, []);
 
     return (
         <Routes>
