@@ -28,17 +28,19 @@ const Sensor = () => {
             console.error("sensor error", err);
         });
 
-        apiGet("/samples?sensorId=" + id, authToken).then((res) => {
-            setSamples(res.data.samples);
-            setTimestamps(res.data.samples.map((sample: any) => moment(sample.createdAt)));
-            setValues(res.data.samples.map((sample: any) => sample.value));
-            setTableRows(res.data.samples.map((sample: any) => ({
-                value: sample.value,
-                activity: moment(sample.createdAt).fromNow()
-            })).reverse().splice(0, 10) as any);
-        }).catch((err) => {
-            console.error("samples error", err);
-        });
+        setInterval(() => {
+            apiGet("/samples?sensorId=" + id, authToken).then((res) => {
+                setSamples(res.data.samples);
+                setTimestamps(res.data.samples.map((sample: any) => moment(sample.createdAt)));
+                setValues(res.data.samples.map((sample: any) => sample.value + (sensor.unit ? (" " + sensor.unit) : "")));
+                setTableRows(res.data.samples.map((sample: any) => ({
+                    value: sample.value + (sensor.unit ? (" " + sensor.unit) : ""),
+                    activity: moment(sample.createdAt).fromNow()
+                })).reverse().splice(0, 10) as any);
+            }).catch((err) => {
+                console.error("samples error", err);
+            });
+        }, 10000);
     }, []);
 
     const InfoCard = ({title, value, description}: { title: any, value: any, description: any }) => (
@@ -70,10 +72,15 @@ const Sensor = () => {
                     ))}
                 </Stack>
             </Stack>
+            <Stack direction={"row"} spacing={3} style={{margin: 10}}>
+                <Typography color="text.secondary" variant="body1">
+                    {sensor.description}
+                </Typography>
+            </Stack>
             <Stack direction={"row"} spacing={5} style={{marginTop: 50}}>
                 <InfoCard
                     title={"Last value"}
-                    value={samples.length > 0 ? samples[samples.length - 1].value as string : "-"}
+                    value={samples.length > 0 ? samples[samples.length - 1].value as string : "-" + (sensor.unit ? (" " + sensor.unit) : "")}
                     description={samples.length > 0 ?
                         "Last activity " + moment(samples[samples.length - 1].createdAt).fromNow()
                         :
