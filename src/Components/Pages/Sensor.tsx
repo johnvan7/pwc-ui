@@ -127,6 +127,12 @@ const Sensor = () => {
                         Last hour
                     </Button>
                     <Button
+                        className={activeButton === 'last6Hours' ? 'active' : ''}
+                        onClick={() => handleButtonClick(moment().subtract(6, 'hours').toISOString(), undefined, 'last6Hours')}
+                    >
+                        Last 6 hours
+                    </Button>
+                    <Button
                         className={activeButton === 'last12Hours' ? 'active' : ''}
                         onClick={() => handleButtonClick(moment().subtract(12, 'hours').toISOString(), undefined, 'last12Hours')}
                     >
