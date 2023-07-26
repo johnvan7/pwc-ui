@@ -2,6 +2,7 @@ import axios from "axios";
 import qs from "query-string";
 
 const baseUrl: string = 'https://pwc-service.giovannivella.com/api';
+//const baseUrl: string = 'http://localhost:3000/api';
 
 export const apiPost = async (path : string, data: {[key: string] : any} = {}, token: string | undefined = undefined) => {
 

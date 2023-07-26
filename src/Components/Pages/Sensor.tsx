@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {useParams} from "react-router-dom";
 import {apiGet} from "../../utils/api";
-import {authToken} from "../../utils/constants";
+import {authToken, mapboxglToken} from "../../utils/constants";
 import {Button, ButtonGroup, Card, CardContent, Chip, Divider, Stack, Typography} from "@mui/material";
 import moment from 'moment';
 import {LineChart} from "@mui/x-charts";
@@ -12,9 +12,22 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import mapboxgl from 'mapbox-gl';
 
 const Sensor = () => {
     const [width, setWidth] = useState<number>(window.innerWidth);
+    const isMobile = width <= 768;
+
+    const {id} = useParams();
+    const [sensor, setSensor] = useState<any>([]);
+    const [samples, setSamples] = useState<any>([]);
+    const [startDate, setStartDate] = useState<any>(moment().subtract(1, 'week').startOf('day').toISOString());
+    const [endDate, setEndDate] = useState<any>(undefined);
+    const [activeButton, setActiveButton] = useState('lastWeek');
+
+    const mapContainer: any = useRef();
+    const map: any = useRef(null);
+    mapboxgl.accessToken = mapboxglToken;
 
     function handleWindowSizeChange() {
         setWidth(window.innerWidth);
@@ -26,15 +39,6 @@ const Sensor = () => {
             window.removeEventListener('resize', handleWindowSizeChange);
         }
     }, []);
-
-    const isMobile = width <= 768;
-
-    const {id} = useParams();
-    const [sensor, setSensor] = useState<any>([]);
-    const [samples, setSamples] = useState<any>([]);
-    const [startDate, setStartDate] = useState<any>(moment().subtract(1, 'week').startOf('day').toISOString());
-    const [endDate, setEndDate] = useState<any>(undefined);
-    const [activeButton, setActiveButton] = useState('lastWeek');
 
     useEffect(() => {
         apiGet("/sensors/" + id, authToken).then((res) => {
@@ -59,6 +63,26 @@ const Sensor = () => {
         });
     }, [startDate, endDate]);
 
+    useEffect(() => {
+        //if (map.current) return; // initialize map only once
+        if (sensor.location && sensor.location.latitude && sensor.location.longitude && sensor.location.altitude) {
+            const lat = sensor.location.latitude as number;
+            const lng = sensor.location.longitude as number;
+            map.current = new mapboxgl.Map({
+                container: mapContainer.current,
+                style: 'mapbox://styles/mapbox/streets-v12',
+                center: [lng, lat],
+                zoom: 14,
+            });
+            new mapboxgl.Marker({})
+                .setLngLat({
+                    lng,
+                    lat
+                })
+                .addTo(map.current);
+        }
+    }, [sensor]);
+
     const handleButtonClick = (startDate: string | undefined, endDate: string | undefined, buttonName: string) => {
         setActiveButton(buttonName);
         setStartDate(startDate);
@@ -66,21 +90,25 @@ const Sensor = () => {
     };
 
     const InfoCard = ({title, value, description}: { title: any, value: any, description: any }) => (
-        <Card>
-            <CardContent>
-                <Typography sx={{fontWeight: 'bold', marginX: 3}} color="text.secondary" variant="h6">
-                    {title}
-                </Typography>
-                <Typography sx={{fontWeight: 'bold', margin: 3}} color="primary" variant="h3">
-                    {value}
-                </Typography>
-                <Divider sx={{margin: 2}}/>
-                <Typography sx={{margin: 1}} color="text.secondary" variant="body2">
-                    {description}
-                </Typography>
-            </CardContent>
-        </Card>
-    );
+            <Card>
+                <CardContent
+                    sx={{display: "flex", flexDirection: 'column', justifyContent: 'space-between', height: "100%"}}>
+                    <Typography sx={{fontWeight: 'bold', marginX: 3, marginBottom: 1}} color="text.secondary" variant="h6">
+                        {title}
+                    </Typography>
+                    <Typography sx={{fontWeight: 'bold', margin: 3}} color="primary" variant="h3">
+                        {value}
+                    </Typography>
+                    <div>
+                        <Divider sx={{marginTop: 1}}/>
+                        <Typography sx={{marginTop: 1}} color="text.secondary" variant="body2">
+                            {description}
+                        </Typography>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    ;
 
     return (
         <Stack spacing={3} style={{marginTop: 30, marginBottom: 50}}>
@@ -116,10 +144,33 @@ const Sensor = () => {
                         :
                         ""}
                 />
+                {(sensor.location && sensor.location.latitude && sensor.location.longitude && sensor.location.altitude) &&
+                    <Card>
+                        <CardContent sx={{
+                            display: "flex",
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            height: "100%"
+                        }}>
+                            <Typography sx={{fontWeight: 'bold', marginX: 3, marginBottom: 1}} color="text.secondary"
+                                        variant="h6">
+                                Location
+                            </Typography>
+                            <div ref={mapContainer} className="map-container" style={{width: 200, height: 200}}/>
+                            <div>
+                                <Divider sx={{marginTop: 1}}/>
+                                <Typography sx={{marginTop: 1}} color="text.secondary" variant="body2">
+                                    Altitude: {sensor.location && sensor.location.altitude} m
+                                </Typography>
+                            </div>
+                        </CardContent>
+                    </Card>
+                }
             </Stack>
             <Divider sx={{margin: 1}}/>
             <Stack direction={"row"} spacing={3} style={{marginTop: 20}}>
-                <ButtonGroup className={isMobile ? "button-group-mobile" :"button-group"} variant="outlined" aria-label="outlined button group">
+                <ButtonGroup className={isMobile ? "button-group-mobile" : "button-group"} variant="outlined"
+                             aria-label="outlined button group">
                     <Button
                         className={activeButton === 'lastHour' ? 'active' : ''}
                         onClick={() => handleButtonClick(moment().subtract(1, 'hours').toISOString(), undefined, 'lastHour')}

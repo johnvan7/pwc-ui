@@ -7,8 +7,8 @@ type Sensor = {
     unit: string;
     allowedUsers: string[];
     location: {
-        latitude: string;
-        longitude: string;
+        latitude: double;
+        longitude: double;
         altitude: number;
     },
     createdAt: string;
