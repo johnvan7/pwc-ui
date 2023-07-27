@@ -1,6 +1,5 @@
 import React from 'react';
-import {Box, Card, CardActionArea, CardContent, Chip, Divider, Stack, Typography} from "@mui/material";
-import SensorCard from "../Cards/SensorCard";
+import {Box, Card, CardContent, Stack, Typography} from "@mui/material";
 import SensorsIcon from "@mui/icons-material/Sensors";
 import {Link} from "react-router-dom";
 

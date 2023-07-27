@@ -42,13 +42,18 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "import/no-webpack-loader-syntax": "off"
+    }
   },
   "browserslist": {
     "production": [
       ">0.2%",
       "not dead",
-      "not op_mini all"
+      "not op_mini all",
+      "not chrome < 51",
+      "not safari < 10"
     ],
     "development": [
       "last 1 chrome version",

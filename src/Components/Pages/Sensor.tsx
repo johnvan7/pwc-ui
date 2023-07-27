@@ -21,9 +21,9 @@ const Sensor = () => {
     const {id} = useParams();
     const [sensor, setSensor] = useState<any>([]);
     const [samples, setSamples] = useState<any>([]);
-    const [startDate, setStartDate] = useState<any>(moment().subtract(1, 'week').startOf('day').toISOString());
+    const [startDate, setStartDate] = useState<any>(moment().subtract(6, 'hours').toISOString());
     const [endDate, setEndDate] = useState<any>(undefined);
-    const [activeButton, setActiveButton] = useState('lastWeek');
+    const [activeButton, setActiveButton] = useState('last6Hours');
 
     const mapContainer: any = useRef();
     const map: any = useRef(null);
@@ -46,7 +46,7 @@ const Sensor = () => {
         }).catch((err) => {
             console.error("sensor error", err);
         });
-    }, []);
+    }, [id]);
 
     useEffect(() => {
         let args = "?sensorId=" + id;
@@ -61,7 +61,7 @@ const Sensor = () => {
         }).catch((err) => {
             console.error("samples error", err);
         });
-    }, [startDate, endDate]);
+    }, [id, startDate, endDate]);
 
     useEffect(() => {
         //if (map.current) return; // initialize map only once
