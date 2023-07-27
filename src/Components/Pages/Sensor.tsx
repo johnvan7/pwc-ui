@@ -132,7 +132,7 @@ const Sensor = () => {
                     title={"Last value"}
                     value={(samples.length > 0 ? (samples[samples.length - 1].value as string) : "-") + (sensor.unit ? (" " + sensor.unit) : "")}
                     description={samples.length > 0 ?
-                        "Last " + moment(samples[samples.length - 1].createdAt).fromNow()
+                        moment(samples[samples.length - 1].createdAt).fromNow()
                         :
                         ""}
                 />
@@ -140,7 +140,7 @@ const Sensor = () => {
                     title={"Total samples"}
                     value={samples.length}
                     description={samples.length > 0 ?
-                        "First " + moment(samples[0].createdAt).fromNow()
+                        "From " + moment(samples[0].createdAt).fromNow()
                         :
                         ""}
                 />

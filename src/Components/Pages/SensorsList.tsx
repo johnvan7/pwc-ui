@@ -1,11 +1,13 @@
 import {Box, Stack} from "@mui/material";
 import SensorCard from "../Cards/SensorCard";
-import React from "react";
+import React, {useState} from "react";
 const SensorsList = ({sensors} : {sensors: Sensor[]}) => {
+    const [width, setWidth] = useState<number>(window.innerWidth);
+    const isMobile = width <= 768;
 
     return (
         <Box marginTop={15}>
-            <Stack direction="row" spacing={10}>
+            <Stack direction={isMobile ? "column": "row"} spacing={10}>
                 {sensors.map((sensor) => (
                     <SensorCard sensor={sensor} />
                 ))}
