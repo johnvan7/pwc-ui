@@ -1,7 +1,7 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import {apiGet} from "../../utils/api";
-import {authToken, mapboxglToken} from "../../utils/constants";
+import {authToken, googleMapToken} from "../../utils/constants";
 import {Button, ButtonGroup, Card, CardContent, Chip, Divider, Stack, Typography} from "@mui/material";
 import moment from 'moment';
 import {LineChart} from "@mui/x-charts";
@@ -12,7 +12,19 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import mapboxgl from 'mapbox-gl';
+import GoogleMapReact from 'google-map-react';
+import {Room} from "@mui/icons-material";
+
+const Marker: React.FC<{ lat: number; lng: number }> = () => (
+    <Room sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '18px',
+        height: '18px',
+        transform: 'translate(-50%, -50%)'
+    }}/>
+);
 
 const Sensor = () => {
     const [width, setWidth] = useState<number>(window.innerWidth);
@@ -24,10 +36,6 @@ const Sensor = () => {
     const [startDate, setStartDate] = useState<any>(moment().subtract(6, 'hours').toISOString());
     const [endDate, setEndDate] = useState<any>(undefined);
     const [activeButton, setActiveButton] = useState('last6Hours');
-
-    const mapContainer: any = useRef();
-    const map: any = useRef(null);
-    mapboxgl.accessToken = mapboxglToken;
 
     function handleWindowSizeChange() {
         setWidth(window.innerWidth);
@@ -62,26 +70,6 @@ const Sensor = () => {
             console.error("samples error", err);
         });
     }, [id, startDate, endDate]);
-
-    useEffect(() => {
-        //if (map.current) return; // initialize map only once
-        if (sensor.location && sensor.location.latitude && sensor.location.longitude && sensor.location.altitude) {
-            const lat = sensor.location.latitude as number;
-            const lng = sensor.location.longitude as number;
-            map.current = new mapboxgl.Map({
-                container: mapContainer.current,
-                style: 'mapbox://styles/mapbox/streets-v12',
-                center: [lng, lat],
-                zoom: 14,
-            });
-            new mapboxgl.Marker({})
-                .setLngLat({
-                    lng,
-                    lat
-                })
-                .addTo(map.current);
-        }
-    }, [sensor]);
 
     const handleButtonClick = (startDate: string | undefined, endDate: string | undefined, buttonName: string) => {
         setActiveButton(buttonName);
@@ -156,7 +144,18 @@ const Sensor = () => {
                                         variant="h6">
                                 Location
                             </Typography>
-                            <div ref={mapContainer} className="map-container" style={{width: 200, height: 200}}/>
+                            <div className="map-container" style={{width: 200, height: 200}}>
+                                <GoogleMapReact
+                                    bootstrapURLKeys={{key: googleMapToken}}
+                                    defaultCenter={{
+                                        lat: sensor.location.latitude,
+                                        lng: sensor.location.longitude
+                                    }}
+                                    defaultZoom={16}
+                                >
+                                    <Marker key={0} lat={sensor.location.latitude} lng={sensor.location.longitude} />
+                                </GoogleMapReact>
+                            </div>
                             <div>
                                 <Divider sx={{marginTop: 1}}/>
                                 <Typography sx={{marginTop: 1}} color="text.secondary" variant="body2">
@@ -259,33 +258,42 @@ const Sensor = () => {
                             History table
                         </Typography>
                         {samples.length > 0 &&
-                            <TableContainer component={Paper}>
-                                <Table sx={{minWidth: isMobile ? width - 50 : 400}} size="small"
-                                       aria-label="a dense table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Value</TableCell>
-                                            <TableCell align="right">Activity</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {(samples.map((sample: any) => ({
-                                            value: sample.value + (sensor.unit ? (" " + sensor.unit) : ""),
-                                            activity: moment(sample.createdAt).fromNow()
-                                        })).reverse().splice(0, 10) as any).map((row: any) => (
-                                            <TableRow
-                                                key={row.id}
-                                                sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                            >
-                                                <TableCell component="th" scope="row">
-                                                    {row.value}
-                                                </TableCell>
-                                                <TableCell align="right">{row.activity}</TableCell>
+                            <>
+                                <TableContainer component={Paper}>
+                                    <Table sx={{minWidth: isMobile ? width - 50 : 400}} size="small"
+                                           aria-label="a dense table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>Value</TableCell>
+                                                <TableCell align="right">Activity</TableCell>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                                        </TableHead>
+                                        <TableBody>
+                                            {(samples.map((sample: any) => ({
+                                                value: sample.value + (sensor.unit ? (" " + sensor.unit) : ""),
+                                                activity: moment(sample.createdAt).fromNow()
+                                            })).reverse().splice(0, 15) as any).map((row: any) => (
+                                                <TableRow
+                                                    key={row.id}
+                                                    sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                                >
+                                                    <TableCell component="th" scope="row">
+                                                        {row.value}
+                                                    </TableCell>
+                                                    <TableCell align="right">{row.activity}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                <Divider sx={{marginTop: 3}}/>
+                                <Typography sx={{marginTop: 1}}
+                                            color="text.secondary"
+                                            variant="body2">
+                                    Showing
+                                    last {samples.length > 15 ? "15" : samples.length} of {samples.length} samples
+                                </Typography>
+                            </>
                         }
                     </CardContent>
                 </Card>
