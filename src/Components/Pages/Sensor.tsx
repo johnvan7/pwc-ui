@@ -132,6 +132,30 @@ const Sensor = () => {
                         :
                         ""}
                 />
+                <Card>
+                    <CardContent
+                        sx={{display: "flex", flexDirection: 'column', justifyContent: 'space-between', height: "100%"}}>
+                        <Typography sx={{fontWeight: 'bold', marginX: 5, marginBottom: 1}} color="text.secondary" variant="h6">
+                            Statistics
+                        </Typography>
+                        <Typography sx={{marginTop: 0}} color="deepskyblue" variant="h6">
+                            Min: {samples.length > 0 ?
+                            (samples.slice().sort((a: any, b: any) => a.value - b.value)[0].value) : "-"} {sensor.unit}
+                        </Typography>
+                        <Typography sx={{marginTop: 0}} color="orangered" variant="h6">
+                            Max: {samples.length > 0 ? (samples.slice().sort((a: any, b: any) => b.value - a.value)[0].value) : "-"} {sensor.unit}
+                        </Typography>
+                        <Typography sx={{marginTop: 0}} color="darkgreen" variant="h6">
+                            Average: {samples.length > 0 ? (samples.reduce((acc: any, b: any) => acc + b.value, 0) / samples.length).toFixed(2) : "-"} {sensor.unit}
+                        </Typography>
+                        <div>
+                            <Divider sx={{marginTop: 0}}/>
+                            <Typography sx={{marginTop: 1}} color="text.secondary" variant="body2">
+
+                            </Typography>
+                        </div>
+                    </CardContent>
+                </Card>
                 {(sensor.location && sensor.location.latitude && sensor.location.longitude && sensor.location.altitude) &&
                     <Card>
                         <CardContent sx={{
