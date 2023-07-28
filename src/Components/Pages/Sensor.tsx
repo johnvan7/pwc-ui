@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import {apiGet} from "../../utils/api";
-import {authToken, googleMapToken} from "../../utils/constants";
+import {googleMapToken} from "../../utils/constants";
 import {Button, ButtonGroup, Card, CardContent, Chip, Divider, Stack, Typography} from "@mui/material";
 import moment from 'moment';
 import {LineChart} from "@mui/x-charts";
@@ -49,7 +49,7 @@ const Sensor = () => {
     }, []);
 
     useEffect(() => {
-        apiGet("/sensors/" + id, authToken).then((res) => {
+        apiGet("/sensors/" + id).then((res) => {
             setSensor(res.data);
         }).catch((err) => {
             console.error("sensor error", err);
@@ -64,7 +64,7 @@ const Sensor = () => {
         if (endDate) {
             args += "&endDate=" + endDate;
         }
-        apiGet("/samples" + args, authToken).then((res) => {
+        apiGet("/samples" + args).then((res) => {
             setSamples(res.data.samples);
         }).catch((err) => {
             console.error("samples error", err);
@@ -99,7 +99,7 @@ const Sensor = () => {
     ;
 
     return (
-        <Stack spacing={3} style={{marginTop: 30, marginBottom: 50}}>
+        <Stack spacing={3} style={{marginTop: 70, marginBottom: 50}}>
             <Stack direction={isMobile ? "column" : "row"} spacing={3} style={{margin: 10}}>
                 <Typography sx={{fontWeight: 'bold'}} color="primary" variant="h5">
                     {sensor.name}

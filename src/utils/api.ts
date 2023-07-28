@@ -1,10 +1,14 @@
 import axios from "axios";
-import qs from "query-string";
+import {isDev} from "./constants";
 
-const baseUrl: string = '/api';
-//const baseUrl: string = 'http://localhost:3000/api';
+const baseUrl: string =
+    (isDev) ?
+        'http://localhost:3000/api'
+        : '/api';
 
-export const apiPost = async (path : string, data: {[key: string] : any} = {}, token: string | undefined = undefined) => {
+export const apiPost = async (path: string, data: {
+    [key: string]: any
+} = {}) => {
 
     let bodyData: { [key: string]: any } = {};
     for (let property in data) {
@@ -14,25 +18,27 @@ export const apiPost = async (path : string, data: {[key: string] : any} = {}, t
         }
     }
 
-    const config : any = {
+    const config: any = {
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
         },
     };
 
+    const token = localStorage.getItem('authToken');
     if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
     }
 
-    return await axios.post(baseUrl + path, qs.stringify(bodyData), config);
+    return await axios.post(baseUrl + path, JSON.stringify(bodyData), config);
 };
 
-export const apiGet = async (path : string, token : string | undefined = undefined) => {
-    const config : any = {
-        headers: { }
+export const apiGet = async (path: string) => {
+    const config: any = {
+        headers: {}
     };
 
-    if(token) {
+    const token = localStorage.getItem('authToken');
+    if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
     }
 

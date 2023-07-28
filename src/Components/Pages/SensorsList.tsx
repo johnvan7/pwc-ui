@@ -2,7 +2,7 @@ import {Box, Stack} from "@mui/material";
 import SensorCard from "../Cards/SensorCard";
 import React, {useState} from "react";
 const SensorsList = ({sensors} : {sensors: Sensor[]}) => {
-    const [width, setWidth] = useState<number>(window.innerWidth);
+    const [width] = useState<number>(window.innerWidth);
     const isMobile = width <= 768;
 
     return (
