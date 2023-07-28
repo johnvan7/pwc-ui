@@ -36,7 +36,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "npm run build && wsl -e ./deploy-ssh.sh ec2-user 15.160.173.128 /home/ec2-user/repos/pwc-ui 2"
+    "deploy": "npm run build && wsl -e ./deploy-ssh.sh ec2-user 15.160.173.128 /home/ec2-user/repos/pwc-service/public"
   },
   "eslintConfig": {
     "extends": [
