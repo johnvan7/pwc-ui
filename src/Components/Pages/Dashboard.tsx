@@ -1,8 +1,7 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Box, Card, CardContent, Stack, Typography} from "@mui/material";
 import SensorsIcon from "@mui/icons-material/Sensors";
 import {Link} from "react-router-dom";
-import {apiGet} from "../../utils/api";
 
 const Dashboard = ({sensors} : {sensors: Sensor[]}) => {
 

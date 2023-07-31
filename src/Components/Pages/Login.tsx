@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {
     Card,
     CardContent,
@@ -86,7 +86,7 @@ const Login = () => {
             spacing={0}
             direction="column"
             alignItems="center"
-            marginTop={"10%"}
+            marginTop={20}
         >
             <Grid item xs={3} spacing={3}>
                 <Card>

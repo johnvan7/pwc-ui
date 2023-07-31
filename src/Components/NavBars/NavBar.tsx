@@ -11,7 +11,7 @@ import {
     Typography
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import {CollectionsBookmark, Edit, Help, Home, UploadFile} from "@mui/icons-material";
+import {Home} from "@mui/icons-material";
 import {useState} from "react";
 import SensorsIcon from "@mui/icons-material/Sensors";
 import {Link} from "react-router-dom";
