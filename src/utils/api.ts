@@ -3,7 +3,7 @@ import {isDev} from "./constants";
 
 const baseUrl: string =
     (isDev) ?
-        'http://localhost:3000/api'
+        process.env.REACT_APP_SERVER_URL || ''
         : '/api';
 
 export const apiPost = async (path: string, data: {

@@ -8,6 +8,7 @@ import {Outlet, Route, Routes, useLocation} from "react-router-dom";
 import Sensor from "./Components/Pages/Sensor";
 import Login from "./Components/Pages/Login";
 import {apiGet} from "./utils/api";
+import {googleMapToken} from "./utils/constants";
 
 const routesNameMap: { [key: string]: string } = {
     "/": "Dashboard",
